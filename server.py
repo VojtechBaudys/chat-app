@@ -5,7 +5,7 @@ serversocket = socket.socket(
     socket.SOCK_STREAM
 )
 
-host = socket.gethostname()
+host = '127.0.0.1'
 port = 2205
 
 serversocket.bind((host, port))
@@ -13,6 +13,8 @@ serversocket.bind((host, port))
 while True:
     serversocket.listen()
     clientsocket, addr = serversocket.accept()
-    clientsocket.sendall(b'Hello world!')
+    msg = clientsocket.recv(1024)
+    print(msg)
+    clientsocket.sendall(msg)
     clientsocket.close()
     
