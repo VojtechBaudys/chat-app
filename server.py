@@ -1,11 +1,21 @@
 import socket
+import threading
+
+def lis():
+    while True:
+        msg = clientsocket.recv(1024)
+        if msg:
+            print(msg)
+            print(addr)
+            clientsocket.sendall(msg)
+        # clientsocket.close()
 
 serversocket = socket.socket(
     socket.AF_INET,
     socket.SOCK_STREAM
 )
 
-host = '127.0.0.1'
+host = '192.168.88.23'
 port = 2205
 
 serversocket.bind((host, port))
@@ -13,8 +23,6 @@ serversocket.bind((host, port))
 while True:
     serversocket.listen()
     clientsocket, addr = serversocket.accept()
-    msg = clientsocket.recv(1024)
-    print(msg)
-    clientsocket.sendall(msg)
-    clientsocket.close()
+    threading.Thread(target=lis())
+
     
