@@ -1,28 +1,38 @@
 import socket
 import threading
 
-def lis():
+def listen():
     while True:
-        msg = clientsocket.recv(1024)
+        serversocket.listen()
+        clientsocket, addr = serversocket.accept()    
+        clientsocket.send(b'connected')
+        print(clientsocket)
+        clients.append(clientsocket)
+        threading.Thread(target=user_handler, args=(clientsocket,)).start()
+
+def user_handler(client):
+    print('handler/////////////')
+    print(client)
+    while True:
+        msg = client.recv(1024)
         if msg:
             print(msg)
-            print(addr)
-            clientsocket.sendall(msg)
-        # clientsocket.close()
+            send_msg()
 
+def send_msg():
+    
+
+clients = []
 serversocket = socket.socket(
     socket.AF_INET,
     socket.SOCK_STREAM
 )
-
 host = '127.0.0.1'
 port = 2205
-
 serversocket.bind((host, port))
 
-while True:
-    serversocket.listen()
-    clientsocket, addr = serversocket.accept()
-    threading.Thread(target=lis())
+lis = threading.Thread(target=listen)
+lis.start()
+lis.join()
 
-    
+serversocket.close()
