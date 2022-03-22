@@ -1,10 +1,11 @@
+from inspect import formatannotation
 import socket
 import threading
 
 def listen():
     while True:
         serversocket.listen()
-        clientsocket, addr = serversocket.accept()    
+        clientsocket, addr = serversocket.accept()
         clientsocket.send(b'connected')
         print(clientsocket)
         clients.append(clientsocket)
@@ -17,10 +18,11 @@ def user_handler(client):
         msg = client.recv(1024)
         if msg:
             print(msg)
-            send_msg()
+            send_msg(msg)
 
-def send_msg():
-    
+def send_msg(msg):
+    for client in clients:
+        client.send(msg)
 
 clients = []
 serversocket = socket.socket(
