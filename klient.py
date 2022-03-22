@@ -21,7 +21,7 @@ s = socket.socket(
     socket.SOCK_STREAM
 )
 
-host = '192.168.88.23'
+host = '127.0.0.1'
 port = 2205
 s.connect((host, port))
 
