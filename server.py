@@ -1,4 +1,3 @@
-from inspect import formatannotation
 import socket
 import threading
 
@@ -6,16 +5,15 @@ def listen():
     while True:
         serversocket.listen()
         clientsocket, addr = serversocket.accept()
-        clientsocket.send(b'connected')
-        print(clientsocket)
+        connected = 'Connected to Tinder'
+        clientsocket.send(connected.encode('utf8'))
         clients.append(clientsocket)
         threading.Thread(target=user_handler, args=(clientsocket,)).start()
-
+        
 def user_handler(client):
-    print('handler/////////////')
     print(client)
     while True:
-        msg = client.recv(1024)
+        msg = client.recv(1000)
         if msg:
             print(msg)
             send_msg(msg)
