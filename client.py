@@ -10,9 +10,20 @@ def leave_login(obj, msg):
 
 def send_msg(event):
     msg = entry_box.get()
-    if len(msg) <= 1000:
+    if msg == '/help':
+        entry_box.delete(0, tk.END)
+        text_box.config(state='normal')
+        text_box.insert(tk.END, 'COMMANDS' + '\n' + '/users' + '\n' + '/leave' + '\n')
+        text_box.config(state='disabled')
+    elif msg == '/users':
         s.send(msg.encode('utf8'))
         entry_box.delete(0, tk.END)
+    elif msg == '/leave':
+        pass
+    else:
+        if len(msg) <= 1000 and msg[0] != '/':
+            s.send(msg.encode('utf8'))
+            entry_box.delete(0, tk.END)
 
 def msg_lisener():
     while True:
@@ -43,6 +54,7 @@ def listen_login():
                 height = 40
             )
             text_box.pack()
+            text_box.insert(tk.END, 'Welcome to the Tinder...' + '\n')
             text_box.config(state='disabled')
 
             entry_box = tk.Entry(
@@ -58,6 +70,8 @@ def listen_login():
             )
             button1.pack()
             
+            root.bind('<Return>', lambda event: send_msg(event))
+
             break
 
 def send_login():
@@ -86,7 +100,6 @@ s.connect((host, port))
 # ---- Tkinter ----
 root = tk.Tk()
 root.title('Tinder')
-# root.bind('<Return>', lambda event: send_msg(event))
 
 login_label = tk.Label(
     text='LOGIN'

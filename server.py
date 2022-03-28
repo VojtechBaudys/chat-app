@@ -6,8 +6,6 @@ def listen():
     while True:
         serversocket.listen()
         clientsocket, addr = serversocket.accept()
-        # connected = 'Connected to Tinder'
-        # clientsocket.send(connected.encode('utf8'))
         clients.append({'id': len(clients) ,'logged': False, 'socket': clientsocket, 'username': ''})
         threading.Thread(target=user_handler, args=(clients[-1],)).start()
         
@@ -18,7 +16,13 @@ def user_handler(client):
             msg = client['socket'].recv(1000).decode('utf8')
             if msg:
                 print(msg)
-                send_msg(client['username'], msg)
+                if msg == '/users':
+                    msg = ''
+                    for client in clients:
+                        msg += client['username'] + '\n'
+                    client_msg(client['socket'], msg)
+                else:
+                    send_msg(client['username'], msg)
         else:
             res = client['socket'].recv(1000).decode('utf8')
             print(res)
@@ -29,18 +33,17 @@ def user_handler(client):
                 if user_data[res['email']]:
                     if user_data[res['email']]['password'] == res['password']:
                         clients[client['id']]['logged'] = True
-                        print(user_data)
                         clients[client['id']]['username'] = user_data[res['email']]['name']
-                        login_msg(client['socket'], '/success')
+                        client_msg(client['socket'], '/success')
                         print(client)
                     else:
-                        login_msg(client['socket'], '/error')
+                        client_msg(client['socket'], '/error')
                 else: 
-                    login_msg(client['socket'], '/error')
+                    client_msg(client['socket'], '/error')
             except:
-                login_msg(client['socket'], '/error')
+                client_msg(client['socket'], '/error')
 
-def login_msg(client, msg):
+def client_msg(client, msg):
     msg = msg.encode('utf8')
     client.send(msg)
 
