@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 
@@ -5,22 +6,48 @@ def listen():
     while True:
         serversocket.listen()
         clientsocket, addr = serversocket.accept()
-        connected = 'Connected to Tinder'
-        clientsocket.send(connected.encode('utf8'))
-        clients.append(clientsocket)
-        threading.Thread(target=user_handler, args=(clientsocket,)).start()
+        # connected = 'Connected to Tinder'
+        # clientsocket.send(connected.encode('utf8'))
+        clients.append({'id': len(clients) ,'logged': False, 'socket': clientsocket, 'username': ''})
+        threading.Thread(target=user_handler, args=(clients[-1],)).start()
         
 def user_handler(client):
     print(client)
     while True:
-        msg = client.recv(1000)
-        if msg:
-            print(msg)
-            send_msg(msg)
+        if client['logged']:
+            msg = client['socket'].recv(1000).decode('utf8')
+            if msg:
+                print(msg)
+                send_msg(client['username'], msg)
+        else:
+            res = client['socket'].recv(1000).decode('utf8')
+            print(res)
+            res = json.loads(res)
+            with open('user_data.json', 'r') as us:
+                user_data = json.load(us)
+            try:
+                if user_data[res['email']]:
+                    if user_data[res['email']]['password'] == res['password']:
+                        clients[client['id']]['logged'] = True
+                        print(user_data)
+                        clients[client['id']]['username'] = user_data[res['email']]['name']
+                        login_msg(client['socket'], '/success')
+                        print(client)
+                    else:
+                        login_msg(client['socket'], '/error')
+                else: 
+                    login_msg(client['socket'], '/error')
+            except:
+                login_msg(client['socket'], '/error')
 
-def send_msg(msg):
+def login_msg(client, msg):
+    msg = msg.encode('utf8')
+    client.send(msg)
+
+def send_msg(username, msg):
+    msg = (username + ': ' + msg).encode('utf8')
     for client in clients:
-        client.send(msg)
+        client['socket'].send(msg)
 
 clients = []
 serversocket = socket.socket(
