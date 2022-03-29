@@ -1,10 +1,14 @@
 {
-    "baudyvo20@sps-prosek.cz": {
+    "baudyvo": {
         "name": "Vojta",
         "password": "123"
     },
     "franta@baudys.cz": {
         "name": "Franta69",
+        "password": "123"
+    },
+    "honza@brousek.cz": {
+        "name": "xX_Honzik_Xx69",
         "password": "123"
     }
 }

@@ -5,22 +5,29 @@ import threading
 def listen():
     while True:
         serversocket.listen()
-        clientsocket, addr = serversocket.accept()
+        clientsocket = serversocket.accept()[0]
+        print(clientsocket)
         clients.append({'id': len(clients) ,'logged': False, 'socket': clientsocket, 'username': ''})
         threading.Thread(target=user_handler, args=(clients[-1],)).start()
         
 def user_handler(client):
     print(client)
-    while True:
+    while client:
         if client['logged']:
             msg = client['socket'].recv(1000).decode('utf8')
             if msg:
                 print(msg)
                 if msg == '/users':
-                    msg = ''
-                    for client in clients:
-                        msg += client['username'] + '\n'
+                    msg = '\n\nUSERS\n'
+                    for one_client in clients:
+                        msg += one_client['username'] + '\n'
+                    print(client)
                     client_msg(client['socket'], msg)
+                elif msg == '/leave':
+                    clients.pop(client['id'])
+                    client = False
+                    print(clients)
+                    print(client)
                 else:
                     send_msg(client['username'], msg)
         else:
@@ -59,10 +66,14 @@ serversocket = socket.socket(
 )
 host = '127.0.0.1'
 port = 2205
-serversocket.bind((host, port))
 
-lis = threading.Thread(target=listen)
-lis.start()
-lis.join()
+try:
+    serversocket.bind((host, port))
 
-serversocket.close()
+    lis = threading.Thread(target=listen)
+    lis.start()
+    lis.join()
+
+    serversocket.close()
+except:
+    print('error')
